@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kết quả bài test trình độ IELTS — YOLA</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="../../assets/img_favicon.png">
+
+<!-- Google Tag Manager -->
+<script>
+var GTM_ID = 'GTM-TSVSP6Z';
+(function(w,d,s,l){if(!GTM_ID)return;w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+var f=d.getElementsByTagName(s)[0],j=d.createElement(s);j.async=true;
+j.src='https://www.googletagmanager.com/gtm.js?id='+GTM_ID;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer');
+</script>
+<!-- End Google Tag Manager -->
+
+<link rel="stylesheet" href="../../assets/tokens.css">
+<style>
+body{background:var(--blue);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.card{background:#fff;border-radius:var(--radius-3xl);max-width:600px;width:100%;padding:44px 36px;text-align:center;box-shadow:var(--shadow-modal)}
+@media(max-width:560px){.card{padding:32px 22px}}
+.card .logo{height:34px;margin:0 auto 22px;display:block;width:auto}
+h1{font-size:clamp(22px,4.6vw,28px);font-weight:var(--fw-xbold);color:var(--navy);line-height:1.25;margin-bottom:20px}
+.score-wrap{display:flex;gap:14px;justify-content:center;margin-bottom:20px;flex-wrap:wrap}
+.score-box{background:var(--grey);border:1.6px solid var(--border);border-radius:var(--radius-lg);padding:18px 22px;min-width:140px}
+.score-box .lbl{font-size:var(--fs-2xs);font-weight:var(--fw-bold);letter-spacing:.05em;text-transform:uppercase;color:var(--text-light);margin-bottom:6px}
+.score-box .val{font-size:clamp(26px,5vw,34px);font-weight:var(--fw-xbold);color:var(--navy);line-height:1.1}
+.score-box.hl{background:var(--navy);border-color:var(--navy)}
+.score-box.hl .lbl{color:var(--text-on-navy)}
+.score-box.hl .val{color:var(--sky);font-size:clamp(19px,3.6vw,24px);padding-top:5px}
+.course{background:rgba(144,235,54,.18);border:1.6px solid var(--lime);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:20px}
+.course .lbl{font-size:var(--fs-2xs);font-weight:var(--fw-bold);letter-spacing:.05em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px}
+.course .val{font-size:18px;font-weight:var(--fw-xbold);color:var(--navy)}
+p{font-size:15px;font-weight:var(--fw-medium);color:var(--text-muted);line-height:1.6;margin-bottom:8px}
+p b{color:var(--navy)}
+.next-box{background:var(--grey);border:1.6px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin:18px 0 6px;text-align:left}
+.next-box h2{font-size:15px;font-weight:var(--fw-xbold);color:var(--navy);margin-bottom:8px}
+.next-box p{font-size:var(--fs-sm);margin-bottom:6px}
+.btn{display:inline-block;margin-top:16px;background:var(--navy);color:#fff;font-weight:var(--fw-xbold);font-size:14px;text-transform:uppercase;letter-spacing:.03em;border-radius:var(--radius-pill);padding:15px 30px;transition:filter var(--transition-fast)}
+.btn:hover{filter:brightness(1.25)}
+.sub{margin-top:16px;font-size:12.5px;color:var(--text-light);font-weight:var(--fw-medium)}
+.review-link{display:inline-block;margin-top:14px;font-size:var(--fs-sm);font-weight:var(--fw-bold);color:var(--blue);text-decoration:underline}
+.hidden{display:none!important}
+.demo-tag{display:inline-block;background:var(--yellow);color:var(--navy);font-size:var(--fs-2xs);font-weight:var(--fw-bold);border-radius:var(--radius-pill);padding:5px 12px;margin-bottom:14px}
+</style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TSVSP6Z" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<div class="card">
+  <img class="logo" src="../../assets/img_logo_blue.png" alt="YOLA" width="120" height="34">
+  <span class="demo-tag hidden" id="demo-tag">KẾT QUẢ DEMO</span>
+  <h1 id="title">Kết quả bài test của bạn</h1>
+
+  <!-- Có điểm trong sessionStorage -->
+  <div id="with-score">
+    <div class="score-wrap">
+      <div class="score-box">
+        <div class="lbl">Số câu đúng</div>
+        <div class="val" id="score">–/10</div>
+      </div>
+      <div class="score-box hl">
+        <div class="lbl">Trình độ (CEFR)</div>
+        <div class="val" id="cefr">–</div>
+      </div>
+    </div>
+    <div class="course">
+      <div class="lbl">Khóa học phù hợp với bạn</div>
+      <div class="val" id="course">–</div>
+    </div>
+    <p>Bài test online đo 2 kỹ năng <b>Listening và Reading</b> nên kết quả mang tính tham khảo.</p>
+  </div>
+
+  <!-- Vào thẳng trang, không có dữ liệu điểm -->
+  <div id="no-score" class="hidden">
+    <p>Bạn đã hoàn thành bài test. Không tìm thấy dữ liệu kết quả trên thiết bị này — kiểm tra tin nhắn Zalo của bạn nhé.</p>
+  </div>
+
+  <div class="next-box">
+    <h2>Bước tiếp theo: thi thử như thi thật, miễn phí</h2>
+    <p>YOLA vừa gửi cho bạn một tin <b>Zalo</b> kèm hướng dẫn đăng ký <b>bài thi thử đầy đủ 4 kỹ năng</b> cùng giáo viên tại trung tâm — chấm cả Speaking và Writing, trả kết quả kèm lộ trình học chi tiết.</p>
+    <p>Nhắn tin cho YOLA qua Zalo để giữ chỗ.</p>
+  </div>
+
+  <a class="btn" href="https://zalo.me/255593115385904054" rel="noopener">Nhắn Zalo đăng ký thi thử</a><br>
+  <a class="review-link hidden" id="btn-review" href="../?review=1">Xem lại bài làm &amp; đáp án</a>
+  <div class="sub">Nếu số của bạn không dùng Zalo, hướng dẫn sẽ được gửi qua SMS.</div>
+</div>
+
+<script>
+(function(){
+  /* Hiện điểm từ sessionStorage (do trang bài làm lưu sau khi server chấm) */
+  var r={};
+  try{ r=JSON.parse(sessionStorage.getItem('yola_test_result')||'{}'); }catch(e){}
+  if(r && typeof r.score==='number'){
+    document.getElementById('score').textContent = r.score+'/'+(r.total||10);
+    document.getElementById('cefr').textContent = r.cefr||'–';
+    document.getElementById('course').textContent = r.course||'–';
+    if(r.demo) document.getElementById('demo-tag').classList.remove('hidden');
+    if(r.details){
+      var rv=document.getElementById('btn-review');
+      rv.classList.remove('hidden');
+      /* file:// không tự mở index.html trong thư mục — sửa href khi xem local */
+      rv.href = '../' + (location.protocol==='file:'?'index.html':'') + '?review=1';
+    }
+  }else{
+    document.getElementById('with-score').classList.add('hidden');
+    document.getElementById('no-score').classList.remove('hidden');
+    document.getElementById('title').textContent='Bạn đã hoàn thành bài test';
+  }
+  /* Conversion: chỉ bắn khi có cờ done=1, sau đó gỡ cờ — reload/back không đếm trùng.
+     Slug không chứa "cam-on" nên không dính trigger GTM cũ.
+     Tag mới: trigger Custom Event `test_lead_success`. */
+  try{
+    var u=new URL(location.href);
+    if(u.searchParams.get('done')==='1'){
+      window.dataLayer=window.dataLayer||[];
+      window.dataLayer.push({event:'test_lead_success',
+        lead_source: u.searchParams.get('utm_source')||'',
+        lead_campaign: u.searchParams.get('utm_campaign')||'',
+        test_score: (typeof r.score==='number'? r.score : '')});
+      setTimeout(function(){
+        u.searchParams.delete('done');
+        history.replaceState(null,'',u.pathname+(u.search||'')+u.hash);
+      }, 2500);
+    }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
