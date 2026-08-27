@@ -19,9 +19,6 @@ j.src='https://www.googletagmanager.com/gtm.js?id='+GTM_ID;f.parentNode.insertBe
 
 <link rel="stylesheet" href="../assets/tokens.css">
 <style>
-/* ===== Demo ribbon — XÓA KHI GO-LIVE ===== */
-.demo-ribbon{background:var(--yellow);color:var(--navy);font-size:var(--fs-xs);font-weight:var(--fw-bold);text-align:center;padding:8px 16px}
-
 /* ===== Header ===== */
 header{position:sticky;top:0;background:#fff;z-index:100;box-shadow:0 2px 14px rgba(0,36,103,.06)}
 .nav{display:flex;align-items:center;gap:20px;height:68px}
@@ -130,8 +127,6 @@ audio{width:100%;margin-bottom:20px}
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TSVSP6Z" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
-<!-- XÓA DẢI NÀY KHI GO-LIVE -->
-<div class="demo-ribbon" id="demo-ribbon">BẢN DEMO NỘI BỘ</div>
 <script src="../assets/config.js"></script>
 
 <header>
@@ -280,10 +275,6 @@ audio{width:100%;margin-bottom:20px}
 var API_URL = (window.YOLA_CONFIG||{}).API_URL || '';   /* cấu hình tại assets/config.js */
 /* Khi mở bằng file:// (xem local), đường dẫn thư mục không tự mở index.html */
 var IDX = (location.protocol==='file:') ? 'index.html' : '';
-/* Dải demo: mô tả đúng trạng thái kết nối hiện tại */
-document.getElementById('demo-ribbon').textContent = API_URL
-  ? 'BẢN TEST NỘI BỘ — OTP test: 123456 · Lead ghi THẬT vào Google Sheet · ZNS tạm tắt'
-  : 'BẢN DEMO NỘI BỘ — OTP thử nghiệm: 123456 · Chưa kết nối Google Sheet (sửa assets/config.js)';
 var OTP_MOCK_CODE = '123456';        /* chỉ dùng khi API_URL trống */
 function isMock(){ return !API_URL; }
 
