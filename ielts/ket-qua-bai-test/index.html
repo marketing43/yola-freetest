@@ -43,6 +43,16 @@ p b{color:var(--navy)}
 .sub{margin-top:16px;font-size:12.5px;color:var(--text-light);font-weight:var(--fw-medium)}
 .review-link{display:inline-block;margin-top:14px;font-size:var(--fs-sm);font-weight:var(--fw-bold);color:var(--blue);text-decoration:underline}
 .hidden{display:none!important}
+.abil{background:#fff;border:1.6px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin:6px 0 18px;text-align:left}
+.abil h2{font-size:15px;font-weight:var(--fw-xbold);color:var(--navy);margin-bottom:4px}
+.abil .sub{font-size:var(--fs-xs);color:var(--text-light);font-weight:var(--fw-medium);margin-bottom:12px}
+.abil .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:560px){.abil .cols{grid-template-columns:1fr}}
+.abil h3{font-size:var(--fs-2xs);font-weight:var(--fw-bold);letter-spacing:.05em;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
+.abil ul{list-style:none;padding:0;margin:0}
+.abil li{position:relative;padding-left:16px;font-size:var(--fs-sm);font-weight:var(--fw-medium);color:var(--text-muted);line-height:1.55;margin-bottom:6px}
+.abil li::before{content:"";position:absolute;left:0;top:9px;width:7px;height:7px;border-radius:50%;background:var(--lime)}
+
 </style>
 </head>
 <body>
@@ -75,6 +85,16 @@ p b{color:var(--navy)}
   <!-- Vào thẳng trang, không có dữ liệu điểm -->
   <div id="no-score" class="hidden">
     <p>Không tìm thấy dữ liệu kết quả trên thiết bị này. Bạn có thể <a id="lnk-retry" href="../" style="color:var(--blue);font-weight:var(--fw-bold);text-decoration:underline">làm lại bài test</a>.</p>
+  </div>
+
+  <!-- Bảng tóm tắt năng lực theo trình độ — dữ liệu trong script ABIL cuối trang -->
+  <div class="abil hidden" id="abil">
+    <h2 id="abil-title"></h2>
+    <div class="sub" id="abil-sub"></div>
+    <div class="cols">
+      <div><h3 id="abil-h1"></h3><ul id="abil-l1"></ul></div>
+      <div><h3 id="abil-h2"></h3><ul id="abil-l2"></ul></div>
+    </div>
   </div>
 
   <div class="next-box">
@@ -150,5 +170,21 @@ p b{color:var(--navy)}
   });
 })();
 </script>
+<!-- ABIL:START — Bảng tóm tắt năng lực. Nguồn: MKT Test for IELTS.docx (mục Level A1–C1), trích nguyên văn -->
+<script>
+(function(){
+  var ABILITY = {"A1": {"nghe": ["Có thể theo dõi lời nói rất chậm và được phát âm cẩn thận, với nhiều khoảng dừng để kịp tiếp nhận ý nghĩa."], "doc": ["Có thể hiểu những văn bản rất ngắn, đơn giản — từng cụm hoặc từng câu một — nhận ra được tên quen thuộc, từ ngữ và cụm từ cơ bản, và đọc lại khi cần thiết."]}, "A2": {"nghe": ["Có thể hiểu 1 số mẫu câu đơn giản, miễn là lời nói được phát âm rõ ràng và chậm rãi.", "Có thể hiểu các cụm từ và cách diễn đạt liên quan đến những lĩnh vực hết sức quen thuộc (ví dụ: thông tin cá nhân và gia đình cơ bản, mua sắm, địa lý địa phương, việc làm), miễn là lời nói rõ ràng và chậm."], "doc": ["Có thể hiểu các văn bản ngắn, đơn giản về những vấn đề quen thuộc và cụ thể, bao gồm ngôn ngữ thường ngày hoặc liên quan đến công việc có tần suất cao.", "Có thể hiểu các văn bản ngắn, đơn giản chứa vốn từ vựng thường gặp nhất, bao gồm một phần các từ quốc tế phổ biến."]}, "B1": {"nghe": ["Có thể hiểu thông tin thực tế đơn giản về những chủ đề quen thuộc hằng ngày hoặc liên quan đến công việc, nhận biết cả thông điệp chung và chi tiết cụ thể, miễn là lời nói rõ ràng với giọng quen thuộc.", "Có thể hiểu ý chính của các bài nói chuẩn, rõ ràng về những vấn đề quen thuộc thường gặp trong công việc, trường học, giải trí… bao gồm cả những câu chuyện ngắn."], "doc": ["Có thể đọc hiểu ở mức chấp nhận được các văn bản thực tế đơn giản về những chủ đề liên quan đến lĩnh vực hoặc sở thích của mình với mức độ hiểu thỏa đáng."]}, "B2": {"nghe": ["Có thể hiểu ngôn ngữ nói chuẩn về cả chủ đề quen thuộc lẫn không quen thuộc thường gặp trong đời sống cá nhân, xã hội, học tập hoặc nghề nghiệp. Chỉ những yếu tố như tiếng ồn nền quá lớn, cấu trúc diễn ngôn thiếu rõ ràng và/hoặc cách dùng thành ngữ mới ảnh hưởng đến khả năng hiểu.", "Có thể hiểu ý chính của các bài nói phức tạp cả về nội dung lẫn ngôn ngữ, trên cả chủ đề cụ thể và trừu tượng, được truyền đạt bằng phương ngữ chuẩn, bao gồm cả các thảo luận kỹ thuật trong lĩnh vực chuyên môn của mình.", "Có thể theo dõi các bài nói dài và lập luận phức tạp nếu chủ đề khá quen thuộc, và nếu bài nói được định hướng bằng các dấu hiệu chỉ dẫn rõ ràng."], "doc": ["Có thể đọc với mức độ độc lập cao, biết điều chỉnh phong cách và tốc độ đọc phù hợp với các loại văn bản và mục đích khác nhau", "Có vốn từ vựng đọc chủ động khá rộng, nhưng có thể gặp khó khăn với các thành ngữ ít gặp."]}, "C1": {"nghe": ["Có thể hiểu đủ để theo dõi các bài nói dài về những chủ đề trừu tượng và phức tạp vượt ra ngoài lĩnh vực của mình, mặc dù đôi khi cần xác nhận lại chi tiết, đặc biệt khi gặp giọng lạ.", "Có thể nhận ra nhiều cách diễn đạt (idiom) và lối nói thông tục, đánh giá được sự thay đổi về sắc thái ngôn ngữ.", "Có thể theo dõi các bài nói dài ngay cả khi không có cấu trúc rõ ràng và khi mối quan hệ ý nghĩa chỉ được ngụ ý mà không nêu trực tiếp."], "doc": ["Có thể hiểu chi tiết các văn bản dài, phức tạp, dù có liên quan đến lĩnh vực chuyên môn của mình hay không, miễn là có thể đọc lại những đoạn khó."]}};
+  function pickAbil(cefr){ var m=(cefr||'').match(/\b(A1|A2|B1|B2|C1)\b/); return m? ABILITY[m[1]] : null; }
+  var r={}; try{ r=JSON.parse(sessionStorage.getItem('yola_test_result')||'{}'); }catch(e){}
+  var a = pickAbil(r && r.cefr); if(!a) return;
+  function fill(id, arr){ var ul=document.getElementById(id); arr.forEach(function(t){ var li=document.createElement('li'); li.textContent=t; ul.appendChild(li); }); }
+  document.getElementById('abil-title').textContent="Bạn có thể làm được gì ở trình độ này";
+  document.getElementById('abil-sub').textContent="Theo khung tham chiếu CEFR — 2 kỹ năng Listening và Reading bài test đã đo";
+  document.getElementById('abil-h1').textContent="Nghe"; fill('abil-l1', a.nghe);
+  document.getElementById('abil-h2').textContent="Đọc"; fill('abil-l2', a.doc);
+  document.getElementById('abil').classList.remove('hidden');
+})();
+</script>
+<!-- ABIL:END -->
 </body>
 </html>

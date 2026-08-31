@@ -493,7 +493,7 @@ document.getElementById('otp-verify').addEventListener('click', function(){
   api('verify_otp', {phone:LEAD.phone, code:code}).then(function(res){
     btn.removeAttribute('disabled');
     if(res && res.ok){ pass(); }
-    else fail((res && res.message) || 'Mã chưa đúng hoặc đã hết hạn.');
+    else fail((res && res.message) || 'Mã chưa đúng, kiểm tra lại tin nhắn.');
   }).catch(function(){
     btn.removeAttribute('disabled');
     document.getElementById('otp-err').textContent='Lỗi kết nối, thử lại.';
