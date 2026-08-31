@@ -143,20 +143,20 @@ header{position:sticky;top:0;background:#fff;z-index:100;box-shadow:0 2px 14px r
         <h3>Tiếng Anh Thiếu nhi</h3>
         <p>Dành cho ba mẹ muốn biết con đang ở đâu so với chuẩn Cambridge Starters – Movers – Flyers.</p>
         <ul>
-          <li>Câu hỏi bằng hình ảnh, phù hợp lứa tuổi tiểu học</li>
+          <li>15 câu nghe và đọc kèm hình, phù hợp lứa tuổi tiểu học</li>
           <li>Kết quả quy chiếu theo chuẩn Cambridge</li>
         </ul>
-        <div class="foot"><span class="soon">Sắp mở</span></div>
+        <div class="foot"><a class="cta light" href="thieu-nhi/"><span class="lbl">Bắt đầu làm bài</span><span class="tail"></span></a></div>
       </div>
       <div class="tcard teen">
         <span class="age">11 – 14 tuổi</span>
         <h3>Tiếng Anh Thiếu niên</h3>
         <p>Kiểm tra nền tảng ngữ pháp, từ vựng và đọc hiểu trước khi con bước vào giai đoạn luyện thi.</p>
         <ul>
-          <li>Đánh giá theo khung CEFR</li>
+          <li>24 câu ngữ pháp và từ vựng, đánh giá theo khung CEFR</li>
           <li>Gợi ý lộ trình học tiếp phù hợp trình độ</li>
         </ul>
-        <div class="foot"><span class="soon">Sắp mở</span></div>
+        <div class="foot"><a class="cta light" href="thieu-nien/"><span class="lbl">Bắt đầu làm bài</span><span class="tail"></span></a></div>
       </div>
       <div class="tcard ielts">
         <span class="age">Từ 14 tuổi</span>
@@ -247,7 +247,7 @@ var API_URL = (window.YOLA_CONFIG||{}).API_URL || '';
 
 /* Mở bằng file:// (xem local): link dạng thư mục không tự mở index.html */
 if(location.protocol==='file:'){
-  document.querySelectorAll('a[href="ielts/"]').forEach(function(a){ a.href='ielts/index.html'; });
+  document.querySelectorAll('a[href="ielts/"],a[href="thieu-nhi/"],a[href="thieu-nien/"]').forEach(function(a){ a.href=a.getAttribute('href')+'index.html'; });
 }
 
 /* ===== Bắt & GIỮ UTM/click-id — trang này là trang land từ ads,
