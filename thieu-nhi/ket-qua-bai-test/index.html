@@ -43,6 +43,16 @@ p b{color:var(--navy)}
 .sub{margin-top:16px;font-size:12.5px;color:var(--text-light);font-weight:var(--fw-medium)}
 .review-link{display:inline-block;margin-top:14px;font-size:var(--fs-sm);font-weight:var(--fw-bold);color:var(--blue);text-decoration:underline}
 .hidden{display:none!important}
+.abil{background:#fff;border:1.6px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin:6px 0 18px;text-align:left}
+.abil h2{font-size:15px;font-weight:var(--fw-xbold);color:var(--navy);margin-bottom:4px}
+.abil .sub{font-size:var(--fs-xs);color:var(--text-light);font-weight:var(--fw-medium);margin-bottom:12px}
+.abil .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:560px){.abil .cols{grid-template-columns:1fr}}
+.abil h3{font-size:var(--fs-2xs);font-weight:var(--fw-bold);letter-spacing:.05em;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
+.abil ul{list-style:none;padding:0;margin:0}
+.abil li{position:relative;padding-left:16px;font-size:var(--fs-sm);font-weight:var(--fw-medium);color:var(--text-muted);line-height:1.55;margin-bottom:6px}
+.abil li::before{content:"";position:absolute;left:0;top:9px;width:7px;height:7px;border-radius:50%;background:var(--lime)}
+
 </style>
 </head>
 <body>
@@ -75,6 +85,16 @@ p b{color:var(--navy)}
   <!-- Vào thẳng trang, không có dữ liệu điểm -->
   <div id="no-score" class="hidden">
     <p>Không tìm thấy dữ liệu kết quả trên thiết bị này. Bạn có thể <a id="lnk-retry" href="../" style="color:var(--blue);font-weight:var(--fw-bold);text-decoration:underline">làm lại bài test</a>.</p>
+  </div>
+
+  <!-- Bảng tóm tắt năng lực theo trình độ — dữ liệu trong script cuối trang -->
+  <div class="abil hidden" id="abil">
+    <h2 id="abil-title"></h2>
+    <div class="sub" id="abil-sub"></div>
+    <div class="cols">
+      <div><h3 id="abil-h1"></h3><ul id="abil-l1"></ul></div>
+      <div><h3 id="abil-h2"></h3><ul id="abil-l2"></ul></div>
+    </div>
   </div>
 
   <div class="next-box">
@@ -148,6 +168,21 @@ p b{color:var(--navy)}
   if(zaloBtn) zaloBtn.addEventListener('click', function(){
     window.dataLayer.push({event:'jp_zalo_cta_click', test_type:'jp'});   /* chưa có trigger GTM — dựng sau nếu cần */
   });
+})();
+</script>
+
+<script>
+(function(){
+  var ABILITY = {"Starters": {"listening": ["Có thể nghe và nhận biết được các chữ cái bằng tiếng Anh, màu sắc, số đếm (1-20), hình dạng, con vật, kích thước....", "Có thể nghe và hiểu được các câu hướng dẫn ngắn và đơn giản.", "Có thể nghe và hiểu được các câu hỏi đơn giản về bản thân như tên, tuổi, các đồ vật yêu thích hoặc các công việc hằng ngày.", "Có thể nghe và hiểu được những câu miêu tả ngắn về người và đồ vật như tên, tuổi , giới tính, cảm xúc, ngoại hình hoặc những việc người hay con vật đang làm."], "rw": ["Có thể đọc và hiểu được các câu đơn và câu hỏi ngắn và đơn giản.", "Có thể đọc hiểu được đoạn truyện ngắn và đơn giản.", "Có thể viết chữ cái trong bảng chữ cái tiếng Anh", "Có thể viết được từ, cụm từ hoặc câu ngắn.", "Có thể đánh vần được các từ vựng đã học một cách chính xác."]}, "Movers": {"listening": ["Có thể nghe và hiểu được các đoạn đối thoại ngắn với các chủ đề có tranh gợi ý đã học.", "Có thể nghe và hiểu được các câu hướng dẫn ngắn và đơn giản.", "Có thể nghe và hiểu được các câu hỏi đơn giản về bản thân như tên, tuổi, các đồ vật yêu thích hoặc các công việc hằng ngày ở hiện tại.", "Có thể nghe và hiểu được những câu miêu tả về người và đồ vật."], "rw": ["Có thể đọc và hiểu được các biển hiệu và thông báo đơn giản.", "Có thể đọc hiểu được đoạn văn hoặc truyện ngắn và đơn giản.", "Có thể viết câu và cụm từ ngắn gọn đơn giản về các hình ảnh và chủ đề đã học.", "Có thể viết được từ, cụm từ hoặc câu ngắn.", "Có thể viết được từ, cụm từ hoặc câu ngắn để đưa ra các thông tin cá nhân.", "Có thể viết được từ, cụm từ hoặc câu ngắn về miêu tả người và vật."]}, "Flyers": {"listening": ["Có thể nghe và hiểu được nhiều hơn 2 câu hướng dẫn cùng một lúc.", "Có thể nghe và hiểu được các câu hỏi về bản thân như tên, tuổi, các đồ vật yêu thích hoặc các công việc hằng ngày.... ở hiện tại hoặc quá khứ.", "Có thể nghe và hiểu được những câu miêu tả về người, đồ vật và các sự kiện.", "Có thể nghe và hiểu được đoạn đối thoại đơn giản với các chủ đề đã học."], "rw": ["Có thể đọc và hiểu được các câu miêu tả về người, vật và các sự kiện.", "Có thể đọc hiểu được đoạn văn hoặc truyện ngắn với các thì trong Tiếng Anh đã học.", "Có thể đọc và hiểu được các những đoạn văn ngắn có các từ mới.", "Có thể viết câu với các từ nối đã học.", "Có thể viết được các câu miêu tả về người, đồ vật, hình ảnh và hành động.", "Có thể viết được đoạn truyện ngắn dựa trên hình gợi ý."]}};
+  function pickAbil(cefr){ var m=(cefr||'').match(/Starters|Movers|Flyers/); return m? ABILITY[m[0]] : null; }
+  var r={}; try{ r=JSON.parse(sessionStorage.getItem('yola_test_result')||'{}'); }catch(e){}
+  var a = pickAbil(r && r.cefr); if(!a) return;
+  function fill(id, arr){ var ul=document.getElementById(id); arr.forEach(function(t){ var li=document.createElement('li'); li.textContent=t; ul.appendChild(li); }); }
+  document.getElementById('abil-title').textContent="Bé có thể làm được gì ở cấp độ này";
+  document.getElementById('abil-sub').textContent="Theo thang năng lực Cambridge Starters – Movers – Flyers của YOLA";
+  document.getElementById('abil-h1').textContent="Nghe"; fill('abil-l1', a["listening"]);
+  document.getElementById('abil-h2').textContent="Đọc và Viết"; fill('abil-l2', a["rw"]);
+  document.getElementById('abil').classList.remove('hidden');
 })();
 </script>
 </body>

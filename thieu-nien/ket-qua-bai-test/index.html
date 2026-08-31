@@ -43,6 +43,16 @@ p b{color:var(--navy)}
 .sub{margin-top:16px;font-size:12.5px;color:var(--text-light);font-weight:var(--fw-medium)}
 .review-link{display:inline-block;margin-top:14px;font-size:var(--fs-sm);font-weight:var(--fw-bold);color:var(--blue);text-decoration:underline}
 .hidden{display:none!important}
+.abil{background:#fff;border:1.6px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin:6px 0 18px;text-align:left}
+.abil h2{font-size:15px;font-weight:var(--fw-xbold);color:var(--navy);margin-bottom:4px}
+.abil .sub{font-size:var(--fs-xs);color:var(--text-light);font-weight:var(--fw-medium);margin-bottom:12px}
+.abil .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:560px){.abil .cols{grid-template-columns:1fr}}
+.abil h3{font-size:var(--fs-2xs);font-weight:var(--fw-bold);letter-spacing:.05em;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
+.abil ul{list-style:none;padding:0;margin:0}
+.abil li{position:relative;padding-left:16px;font-size:var(--fs-sm);font-weight:var(--fw-medium);color:var(--text-muted);line-height:1.55;margin-bottom:6px}
+.abil li::before{content:"";position:absolute;left:0;top:9px;width:7px;height:7px;border-radius:50%;background:var(--lime)}
+
 </style>
 </head>
 <body>
@@ -75,6 +85,16 @@ p b{color:var(--navy)}
   <!-- Vào thẳng trang, không có dữ liệu điểm -->
   <div id="no-score" class="hidden">
     <p>Không tìm thấy dữ liệu kết quả trên thiết bị này. Bạn có thể <a id="lnk-retry" href="../" style="color:var(--blue);font-weight:var(--fw-bold);text-decoration:underline">làm lại bài test</a>.</p>
+  </div>
+
+  <!-- Bảng tóm tắt năng lực theo trình độ — dữ liệu trong script cuối trang -->
+  <div class="abil hidden" id="abil">
+    <h2 id="abil-title"></h2>
+    <div class="sub" id="abil-sub"></div>
+    <div class="cols">
+      <div><h3 id="abil-h1"></h3><ul id="abil-l1"></ul></div>
+      <div><h3 id="abil-h2"></h3><ul id="abil-l2"></ul></div>
+    </div>
   </div>
 
   <div class="next-box">
@@ -148,6 +168,21 @@ p b{color:var(--navy)}
   if(zaloBtn) zaloBtn.addEventListener('click', function(){
     window.dataLayer.push({event:'js_zalo_cta_click', test_type:'js'});   /* chưa có trigger GTM — dựng sau nếu cần */
   });
+})();
+</script>
+
+<script>
+(function(){
+  var ABILITY = {"A1": {"hieu": ["Có thể hiểu được câu ngắn, ngữ cảnh quen thuộc.", "Nhận biết và chọn đúng từ/cụm từ để hoàn thành câu.", "Hiểu được sự khác biệt cơ bản giữa các từ gần nghĩa (ví dụ: They / Their / They’re).", "Có khả năng nhận diện từ vựng quen thuộc về cuộc sống hàng ngày (trainers, legs, snow, aircraft)."], "dung": ["Có thể dùng từ đúng ngữ pháp trong câu đơn giản.", "Biết cách sử dụng trạng từ để bổ nghĩa cho động từ (drive safely).", "Có thể phân loại, miêu tả sự vật theo nhóm (planes and helicopters → aircraft)."]}, "A2": {"hieu": ["Hiểu và phân biệt được cấu trúc ngữ pháp cơ bản nhưng ở mức phức tạp hơn A1 (used to / didn’t use to).", "Có khả năng nhận diện các cấu trúc giả định (if you were me).", "Hiểu được ngữ cảnh câu để chọn từ chính xác (edge of the table, mean to disturb).", "Xử lý được văn bản ngắn chứa cấu trúc không còn hoàn toàn quen thuộc hàng ngày."], "dung": ["Có thể sử dụng các thì cơ bản ở quá khứ và hiện tại trong câu đơn và câu điều kiện.", "Biết dùng các cụm từ chính xác để diễn đạt ý định hoặc xin lỗi (I didn’t mean to…).", "Có vốn từ vựng đa dạng hơn A1, bao gồm từ trừu tượng hơn (advice, disturb, suppose)."]}, "B1": {"hieu": ["Hiểu và sử dụng thành thạo giới từ đi với cụm động từ cố định (look forward to).", "Nắm được cấu trúc ngữ pháp phức tạp hơn như mệnh đề nhượng bộ (No matter how tired…).", "Hiểu cách dùng cụm từ cố định chính xác trong ngữ cảnh (give the floor a wipe).", "Hiểu được sắc thái từ vựng trừu tượng và tình cảm (admiration, jealousy)."], "dung": ["Có thể tạo ra các câu phức hợp, mệnh đề phụ, và sử dụng chính xác liên từ diễn đạt quan hệ logic (although, no matter how).", "Có vốn từ vựng phong phú hơn, bao gồm cụm từ diễn đạt cảm xúc, nhân cách.", "Có thể viết các đoạn văn ngắn mô tả suy nghĩ, cảm xúc, mối quan hệ xã hội."]}, "B2": {"hieu": ["Hiểu và phân biệt được mệnh đề quan hệ (the house which we used to live in).", "Hiểu cấu trúc rút gọn, miêu tả tình huống (with the furniture gone).", "Nắm được từ vựng mang tính học thuật và trừu tượng hơn (initiate conversation).", "Hiểu cụm động từ thành ngữ trong ngữ cảnh xã hội (make up after a fight)."], "dung": ["Có thể sử dụng chính xác câu phức hợp, mệnh đề quan hệ.", "Viết được câu miêu tả tình huống, dùng cấu trúc linh hoạt (with + noun + past participle).", "Có khả năng chọn từ vựng phù hợp với sắc thái ý nghĩa (bắt đầu, duy trì hội thoại).", "Biết dùng collocations và phrasal verbs tự nhiên trong văn viết."]}, "C1": {"hieu": ["Nhận diện và sử dụng cấu trúc đảo ngữ nâng cao (Only by using it can you master the language).", "Hiểu cách dùng liên từ trang trọng, ít gặp trong giao tiếp hằng ngày (should you be in need of…).", "Hiểu và vận dụng thành ngữ/cụm từ cố định đặc thù (in the nick of time).", "Xử lý được từ vựng ít quen thuộc, mang sắc thái mạnh về cảm xúc (seizure trong ngữ cảnh sốc, bất ngờ)."], "dung": ["Có thể viết câu phức hợp với cấu trúc nâng cao, đảo ngữ.", "Biết lựa chọn từ vựng và cụm từ chính xác để diễn đạt ý tưởng tinh tế.", "Sử dụng được thành ngữ, collocations tự nhiên, thể hiện mức độ thành thạo cao hơn trong văn viết.", "Có khả năng viết câu linh hoạt, mạch lạc, phù hợp với văn cảnh trang trọng và học thuật."]}, "C2": {"hieu": ["Hiểu và phân biệt được các liên từ trang trọng, ít dùng trong đời sống hằng ngày (notwithstanding).", "Nhận diện cấu trúc ngữ pháp nâng cao, hàm ý tinh tế (so much as survive the conversation).", "Hiểu thành ngữ và cụm từ cố định trừu tượng (draw the line at…, no bed of roses).", "Có khả năng xử lý ý nghĩa ẩn dụ và cách diễn đạt giàu hình ảnh."], "dung": ["Có thể sử dụng từ vựng học thuật, thành ngữ, và liên từ nâng cao trong câu văn.", "Biết diễn đạt sắc thái ý nghĩa tinh tế (đặt giới hạn, thể hiện quan điểm, miêu tả khó khăn).", "Có khả năng viết văn bản phức tạp, giàu tính liên kết, với vốn từ linh hoạt và chính xác.", "Có thể diễn đạt tự nhiên cả trong ngữ cảnh học thuật lẫn sáng tạo."]}};
+  function pickAbil(cefr){ var m=(cefr||'').match(/\b(A1|A2|B1|B2|C1|C2)\b/); return m? ABILITY[m[1]] : null; }
+  var r={}; try{ r=JSON.parse(sessionStorage.getItem('yola_test_result')||'{}'); }catch(e){}
+  var a = pickAbil(r && r.cefr); if(!a) return;
+  function fill(id, arr){ var ul=document.getElementById(id); arr.forEach(function(t){ var li=document.createElement('li'); li.textContent=t; ul.appendChild(li); }); }
+  document.getElementById('abil-title').textContent="Bạn có thể làm được gì ở trình độ này";
+  document.getElementById('abil-sub').textContent="Trích từ thang đánh giá của bài test — theo ngữ pháp và từ vựng đã đo";
+  document.getElementById('abil-h1').textContent="Hiểu và nhận biết"; fill('abil-l1', a["hieu"]);
+  document.getElementById('abil-h2').textContent="Vận dụng và diễn đạt"; fill('abil-l2', a["dung"]);
+  document.getElementById('abil').classList.remove('hidden');
 })();
 </script>
 </body>
