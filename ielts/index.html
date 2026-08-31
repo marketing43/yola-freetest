@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bài test trình độ IELTS miễn phí — YOLA</title>
-<meta name="description" content="Làm bài test IELTS Listening và Reading miễn phí theo định dạng đề thi thật. Kết quả gửi qua Zalo.">
+<meta name="description" content="Làm bài test IELTS Listening và Reading miễn phí theo định dạng đề thi thật. Nhận kết quả và khóa học gợi ý ngay khi nộp bài.">
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/png" href="../assets/img_favicon.png">
 
@@ -270,13 +270,11 @@ audio{width:100%;margin-bottom:20px}
 
 <script>
 /* =====================================================================
-   CẤU HÌNH — dán URL Apps Script Web App là chạy thật; để trống = demo
+   CẤU HÌNH — API_URL (Apps Script Web App) đặt tại assets/config.js
    ===================================================================== */
-var API_URL = (window.YOLA_CONFIG||{}).API_URL || '';   /* cấu hình tại assets/config.js */
+var API_URL = (window.YOLA_CONFIG||{}).API_URL || '';
 /* Khi mở bằng file:// (xem local), đường dẫn thư mục không tự mở index.html */
 var IDX = (location.protocol==='file:') ? 'index.html' : '';
-var OTP_MOCK_CODE = '123456';        /* chỉ dùng khi API_URL trống */
-function isMock(){ return !API_URL; }
 
 /* Gọi backend Apps Script. Content-Type text/plain để tránh CORS preflight
    (Apps Script không trả preflight; simple request thì đọc được response). */
@@ -433,12 +431,9 @@ document.getElementById('regform').addEventListener('submit', function(e){
 /* =====================================================================
    OTP — gửi/kiểm qua Apps Script (vendor VietGuys, ZNS template 514414,
    fail-over SMS do vendor xử lý qua tham số failover:"sms").
-   API_URL trống = mock, nhận mã 123456.
    ===================================================================== */
 function requestOtp(){
-  if(isMock()){ toast('DEMO: mã OTP là '+OTP_MOCK_CODE); return Promise.resolve({ok:true}); }
   return api('send_otp', {phone:LEAD.phone}).then(function(res){
-    if(res && res.ok && res.test) toast('Chế độ test: nhập mã '+OTP_MOCK_CODE);
     if(res && res.ok) return res;
     document.getElementById('otp-err').textContent = (res && res.message) || 'Không gửi được mã, thử lại sau.';
     return res;
@@ -494,10 +489,6 @@ document.getElementById('otp-verify').addEventListener('click', function(){
     document.getElementById('otp-err').textContent = msg;
     dl('ielts_otp_verify_fail', {reason: msg});   /* GTM: "Hiện popup OTP sai/hết hạn" */
   }
-  if(isMock()){
-    if(code!==OTP_MOCK_CODE){ fail('Mã chưa đúng, thử lại'); return; }
-    pass(); return;
-  }
   btn.setAttribute('disabled','');
   api('verify_otp', {phone:LEAD.phone, code:code}).then(function(res){
     btn.removeAttribute('disabled');
@@ -518,7 +509,7 @@ function leadPayload(){
     full_name: LEAD.name,
     phone_number: LEAD.phone,
     email: LEAD.email,
-    program: 'IELTS',                      /* TODO: chốt mã riêng cho phễu test (vd IELTS-TEST) */
+    program: 'IELTS',                      /* mã CRM; đổi tại đây nếu chốt mã riêng cho phễu test */
     center: LEAD.center,
     description: 'Lead từ bài test trình độ IELTS online — đã verify OTP',
     landing_page_url: TRACK.first_url || location.href,
@@ -534,7 +525,6 @@ function leadPayload(){
 function sendVerifiedLead(){
   dl('ielts_otp_verify_success', null, true);   /* GTM: "OTP đúng, vào trang test" */
   var payload=leadPayload();
-  if(isMock()){ console.log('[DEMO] lead payload:', payload); return; }
   /* Ghi vào sheet Leads — sendBeacon để không rớt */
   try{
     var body=JSON.stringify(Object.assign({action:'save_lead'}, payload));
@@ -644,16 +634,6 @@ function doSubmit(force){
     q = q ? (q+'&done=1') : '?done=1';
     /* IDX: file:// không tự mở index.html trong thư mục — thêm rõ tên file khi xem local */
     location.href='ket-qua-bai-test/'+IDX+q;
-  }
-  if(isMock()){
-    console.log('[DEMO] test submission:', payload);
-    /* Kết quả demo kèm chi tiết từng câu để xem trang review — giá trị giả, gắn nhãn DEMO */
-    var details={};
-    LISTENING.forEach(function(q){ details['q'+q.n]={your:ANSWERS['q'+q.n]||'', correct:q.opts[0], ok:(ANSWERS['q'+q.n]===q.opts[0])}; });
-    READING.forEach(function(q){ details['q'+q.n]={your:ANSWERS['q'+q.n]||'', correct:'TRUE', ok:(ANSWERS['q'+q.n]==='TRUE')}; });
-    var sc=Object.keys(details).filter(function(k){return details[k].ok}).length;
-    go({score:sc,total:10,cefr:'B1+ (Intermediate)',course:'IELTS 5.5 – IELTS 6.0',details:details,demo:true});
-    return;
   }
   api('submit_test', payload).then(function(res){
     if(res && res.ok){ go(res); }

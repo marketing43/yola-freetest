@@ -43,7 +43,6 @@ p b{color:var(--navy)}
 .sub{margin-top:16px;font-size:12.5px;color:var(--text-light);font-weight:var(--fw-medium)}
 .review-link{display:inline-block;margin-top:14px;font-size:var(--fs-sm);font-weight:var(--fw-bold);color:var(--blue);text-decoration:underline}
 .hidden{display:none!important}
-.demo-tag{display:inline-block;background:var(--yellow);color:var(--navy);font-size:var(--fs-2xs);font-weight:var(--fw-bold);border-radius:var(--radius-pill);padding:5px 12px;margin-bottom:14px}
 </style>
 </head>
 <body>
@@ -52,7 +51,6 @@ p b{color:var(--navy)}
 
 <div class="card">
   <img class="logo" src="../../assets/img_logo_blue.png" alt="YOLA" width="120" height="34">
-  <span class="demo-tag hidden" id="demo-tag">KẾT QUẢ DEMO</span>
   <h1 id="title">Kết quả bài test của bạn</h1>
 
   <!-- Có điểm trong sessionStorage -->
@@ -76,7 +74,7 @@ p b{color:var(--navy)}
 
   <!-- Vào thẳng trang, không có dữ liệu điểm -->
   <div id="no-score" class="hidden">
-    <p>Bạn đã hoàn thành bài test. Không tìm thấy dữ liệu kết quả trên thiết bị này — kiểm tra tin nhắn Zalo của bạn nhé.</p>
+    <p>Không tìm thấy dữ liệu kết quả trên thiết bị này. Bạn có thể <a id="lnk-retry" href="../" style="color:var(--blue);font-weight:var(--fw-bold);text-decoration:underline">làm lại bài test</a>.</p>
   </div>
 
   <div class="next-box">
@@ -99,7 +97,6 @@ p b{color:var(--navy)}
     document.getElementById('score').textContent = r.score+'/'+(r.total||10);
     document.getElementById('cefr').textContent = r.cefr||'–';
     document.getElementById('course').textContent = r.course||'–';
-    if(r.demo) document.getElementById('demo-tag').classList.remove('hidden');
     if(r.details){
       var rv=document.getElementById('btn-review');
       rv.classList.remove('hidden');
@@ -109,7 +106,8 @@ p b{color:var(--navy)}
   }else{
     document.getElementById('with-score').classList.add('hidden');
     document.getElementById('no-score').classList.remove('hidden');
-    document.getElementById('title').textContent='Bạn đã hoàn thành bài test';
+    document.getElementById('title').textContent='Kết quả bài test';
+    var lr=document.getElementById('lnk-retry'); if(lr) lr.href='../'+(location.protocol==='file:'?'index.html':'');
   }
   /* ===== Tracking — taxonomy `ielts_*` đã có sẵn trong GTM-TSVSP6Z (audit 31/08/2026) =====
      - ielts_result_view : conversion. Trigger này nối 3 tag đã published: GA4 "Load trang kết quả",
