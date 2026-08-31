@@ -111,23 +111,45 @@ p b{color:var(--navy)}
     document.getElementById('no-score').classList.remove('hidden');
     document.getElementById('title').textContent='Bạn đã hoàn thành bài test';
   }
-  /* Conversion: chỉ bắn khi có cờ done=1, sau đó gỡ cờ — reload/back không đếm trùng.
-     Slug không chứa "cam-on" nên không dính trigger GTM cũ.
-     Tag mới: trigger Custom Event `test_lead_success`. */
+  /* ===== Tracking — taxonomy `ielts_*` đã có sẵn trong GTM-TSVSP6Z (audit 31/08/2026) =====
+     - ielts_result_view : conversion. Trigger này nối 3 tag đã published: GA4 "Load trang kết quả",
+       Google Ads "Submit form success - Freetest - Luyện thi IELTS", và "Theo dõi ngoại tuyến 9690".
+       Chỉ bắn khi vừa nộp bài (cờ done=1, tự gỡ sau 2,5s) — reload/back không đếm trùng.
+     - user_data {email, phone_number} : tag "Theo dõi ngoại tuyến 9690" đọc biến dataLayer `user_data`
+       (JS trong GTM tự đổi 0xxx → +84xxx) để match conversion ngoại tuyến. Lấy từ form đã verify OTP.
+     - ielts_result_return : mở lại trang kết quả (không có done=1) — không phải conversion.
+     Slug không chứa "cam-on" nên không dính trigger GTM cũ dùng chung với LDP Ladipage. */
+  window.dataLayer=window.dataLayer||[];
+  var lead={};
+  try{ lead=JSON.parse(sessionStorage.getItem('yola_test_lead')||'{}'); }catch(e){}
+  var userData = (lead && (lead.email||lead.phone)) ? {email: lead.email||undefined, phone_number: lead.phone||undefined} : undefined;
   try{
     var u=new URL(location.href);
+    var hasScore = (r && typeof r.score==='number');
     if(u.searchParams.get('done')==='1'){
-      window.dataLayer=window.dataLayer||[];
-      window.dataLayer.push({event:'test_lead_success',
+      window.dataLayer.push({event:'ielts_result_view', test_type:'ielts',
+        user_data: userData,
         lead_source: u.searchParams.get('utm_source')||'',
         lead_campaign: u.searchParams.get('utm_campaign')||'',
-        test_score: (typeof r.score==='number'? r.score : '')});
+        test_score: hasScore ? r.score : '',
+        test_level: (r && r.cefr) || ''});
       setTimeout(function(){
         u.searchParams.delete('done');
         history.replaceState(null,'',u.pathname+(u.search||'')+u.hash);
       }, 2500);
+    }else if(hasScore){
+      window.dataLayer.push({event:'ielts_result_return', test_type:'ielts', test_score:r.score});
     }
   }catch(e){}
+  /* Click trên trang kết quả */
+  var rvLink=document.getElementById('btn-review');
+  if(rvLink) rvLink.addEventListener('click', function(){
+    window.dataLayer.push({event:'ielts_view_full_result_click', test_type:'ielts'});   /* GTM: "Click Xem toàn bộ kết quả" */
+  });
+  var zaloBtn=document.querySelector('a.btn[href*="zalo.me"]');
+  if(zaloBtn) zaloBtn.addEventListener('click', function(){
+    window.dataLayer.push({event:'ielts_zalo_cta_click', test_type:'ielts'});   /* chưa có trigger GTM — dựng sau nếu cần */
+  });
 })();
 </script>
 </body>

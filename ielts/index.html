@@ -354,6 +354,18 @@ function trackQuery(){
   return p.length ? ('?'+p.join('&')) : '';
 }
 
+/* ===== dataLayer — dùng ĐÚNG taxonomy `ielts_*` đã dựng sẵn trong GTM-TSVSP6Z
+   (audit 31/08/2026: 20 trigger Custom Event + tag GA4 đã published, không cần sửa GTM).
+   dl(name, params, once): once=true → chỉ bắn 1 lần/phiên trang (chống đếm trùng). ===== */
+var DL_FIRED={};
+function dl(name, params, once){
+  if(once && DL_FIRED[name]) return;
+  DL_FIRED[name]=true;
+  window.dataLayer=window.dataLayer||[];
+  var o=Object.assign({event:name, test_type:'ielts'}, params||{});
+  window.dataLayer.push(o);
+}
+
 /* ===== Giờ Việt Nam YYYY-MM-DD HH:mm:ss ===== */
 function vnTime(){
   try{
@@ -383,8 +395,27 @@ var LEAD = {};
   });
 })();
 function setInvalid(id, bad){ document.getElementById(id).classList.toggle('invalid', !!bad); }
+
+/* --- Funnel form: ielts_form_view → ielts_form_start → ielts_form_complete → ielts_start_test_click --- */
+(function(){
+  var isReview=false;
+  try{ isReview = new URLSearchParams(location.search).get('review')==='1'; }catch(e){}
+  if(!isReview) dl('ielts_form_view', null, true);
+  var ids=['f-name','f-phone','f-email','f-test','f-center'];
+  function allFilled(){ return ids.every(function(id){ var el=document.getElementById(id); return el && el.value.trim()!==''; }); }
+  ids.forEach(function(id){
+    var el=document.getElementById(id); if(!el) return;
+    ['input','change'].forEach(function(ev){
+      el.addEventListener(ev, function(){
+        dl('ielts_form_start', {field:id}, true);
+        if(allFilled()) dl('ielts_form_complete', null, true);   /* "Điền đủ 5 field" */
+      });
+    });
+  });
+})();
 document.getElementById('regform').addEventListener('submit', function(e){
   e.preventDefault();
+  dl('ielts_start_test_click', null, true);
   var name=document.getElementById('f-name').value.trim();
   var phone=document.getElementById('f-phone').value.trim();
   var email=document.getElementById('f-email').value.trim();
@@ -425,16 +456,18 @@ function openOtp(){
   var inputs=document.getElementById('otp-row').querySelectorAll('input');
   inputs.forEach(function(i){i.value=''});
   inputs[0].focus();
-  window.dataLayer.push({event:'otp_shown'});
+  dl('ielts_otp_popup_view');            /* GTM: "Popup OTP hiển thị" */
   requestOtp();
 }
 document.getElementById('otp-close').addEventListener('click', function(){
   document.getElementById('otp-modal').classList.add('hidden');
+  dl('ielts_otp_popup_close');           /* GTM: "User đóng popup OTP" */
 });
 (function(){
   var inputs=Array.prototype.slice.call(document.getElementById('otp-row').querySelectorAll('input'));
   inputs.forEach(function(inp,i){
     inp.addEventListener('input', function(){
+      dl('ielts_otp_input_start', null, true);   /* GTM: "Nhập ký tự OTP đầu tiên" */
       inp.value=inp.value.replace(/\D/g,'').slice(0,1);
       if(inp.value && i<inputs.length-1) inputs[i+1].focus();
     });
@@ -451,20 +484,25 @@ document.getElementById('otp-verify').addEventListener('click', function(){
   var btn=this;
   var code=Array.prototype.map.call(document.getElementById('otp-row').querySelectorAll('input'),function(i){return i.value}).join('');
   if(code.length<6){ document.getElementById('otp-err').textContent='Nhập đủ 6 số'; return; }
+  dl('ielts_otp_verify_click');          /* GTM: "Click Xác thực ngay" */
   function pass(){
     document.getElementById('otp-modal').classList.add('hidden');
     sendVerifiedLead();
     startQuiz();
   }
+  function fail(msg){
+    document.getElementById('otp-err').textContent = msg;
+    dl('ielts_otp_verify_fail', {reason: msg});   /* GTM: "Hiện popup OTP sai/hết hạn" */
+  }
   if(isMock()){
-    if(code!==OTP_MOCK_CODE){ document.getElementById('otp-err').textContent='Mã chưa đúng, thử lại'; return; }
+    if(code!==OTP_MOCK_CODE){ fail('Mã chưa đúng, thử lại'); return; }
     pass(); return;
   }
   btn.setAttribute('disabled','');
   api('verify_otp', {phone:LEAD.phone, code:code}).then(function(res){
     btn.removeAttribute('disabled');
     if(res && res.ok){ pass(); }
-    else document.getElementById('otp-err').textContent = (res && res.message) || 'Mã chưa đúng hoặc đã hết hạn.';
+    else fail((res && res.message) || 'Mã chưa đúng hoặc đã hết hạn.');
   }).catch(function(){
     btn.removeAttribute('disabled');
     document.getElementById('otp-err').textContent='Lỗi kết nối, thử lại.';
@@ -494,7 +532,7 @@ function leadPayload(){
   };
 }
 function sendVerifiedLead(){
-  window.dataLayer.push({event:'test_otp_verified'});
+  dl('ielts_otp_verify_success', null, true);   /* GTM: "OTP đúng, vào trang test" */
   var payload=leadPayload();
   if(isMock()){ console.log('[DEMO] lead payload:', payload); return; }
   /* Ghi vào sheet Leads — sendBeacon để không rớt */
@@ -540,7 +578,10 @@ function renderQs(){
       var group=inp.closest('.opts');
       group.querySelectorAll('.opt').forEach(function(o){o.classList.remove('sel')});
       inp.closest('.opt').classList.add('sel');
+      var isChange = ANSWERS.hasOwnProperty(inp.name);
       ANSWERS[inp.name]=inp.value;
+      dl('ielts_test_start', null, true);                       /* GTM: "Chọn đáp án đầu tiên" */
+      dl(isChange ? 'ielts_answer_change' : 'ielts_answer_select', {question: inp.name});
       updateProgress();
     });
   });
@@ -549,6 +590,9 @@ function updateProgress(){
   var done=Object.keys(ANSWERS).length;
   document.getElementById('ptxt').textContent=done+'/'+TOTAL_Q+' câu';
   document.getElementById('pfill').style.width=(done/TOTAL_Q*100)+'%';
+  /* Mốc tiến độ 25/50/75/100% — mỗi mốc bắn 1 lần (GTM: "Trả lời đạt x%") */
+  var pct=done/TOTAL_Q*100;
+  [25,50,75,100].forEach(function(m){ if(pct>=m) dl('ielts_test_progress_'+m, {answered:done}, true); });
   var btn=document.getElementById('btn-submit');
   btn.disabled = done<TOTAL_Q;
   document.getElementById('submit-hint').textContent =
@@ -575,9 +619,14 @@ function startQuiz(){
   document.getElementById('step-quiz').classList.remove('hidden');
   window.scrollTo(0,0);
   startTimer();
-  window.dataLayer.push({event:'test_started'});
+  window.__quizActive=true;
+  dl('ielts_test_page_view', null, true);      /* GTM: "Load trang nội dung bài test" */
 }
 renderQs();
+/* Rời trang bài làm trước khi nộp (đóng tab / back) — GTM: "Rời trang test trước khi ra result" */
+window.addEventListener('pagehide', function(){
+  if(window.__quizActive && !window.__submitted) dl('ielts_test_abandon', {answered:Object.keys(ANSWERS).length}, true);
+});
 
 /* ===== Nộp bài (force=true khi hết giờ: nộp cả bài chưa trả lời đủ) ===== */
 function doSubmit(force){
@@ -587,7 +636,8 @@ function doSubmit(force){
   btn.setAttribute('disabled','');
   btn.querySelector('.lbl').textContent='Đang chấm bài…';
   var payload=Object.assign({action:'submit_test', answers:ANSWERS, test:'IELTS'}, leadPayload());
-  window.dataLayer.push({event:'test_submitted', forced: !!force});
+  /* GTM: "Click Hoàn thành bài test" — submit_mode: manual (bấm nút) / auto (hết 15 phút) */
+  dl('ielts_test_submit_click', {submit_mode: force?'auto':'manual', answered:Object.keys(ANSWERS).length});
   function go(result){
     try{ sessionStorage.setItem('yola_test_result', JSON.stringify(result||{})); }catch(e){}
     var q=trackQuery();
