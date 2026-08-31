@@ -173,7 +173,7 @@ audio{width:100%;margin-bottom:20px}
         <span class="fstep"><b>3</b> Nhận kết quả</span>
       </div>
       <h1>Bài test trình độ Tiếng Anh Thiếu nhi</h1>
-      <p class="lead">Dành cho bé 6–11 tuổi: 15 câu Listening &amp; Reading kèm hình theo chuẩn Cambridge Starters – Movers – Flyers. Ba mẹ điền thông tin, bé làm bài (khoảng 15 phút) — nhận kết quả và lớp học phù hợp miễn phí.</p>
+      <p class="lead">Dành cho bé 6–11 tuổi: 15 câu Listening &amp; Reading kèm hình theo chuẩn Cambridge Starters – Movers – Flyers. Ba mẹ điền thông tin, bé làm bài (15 phút) — nhận kết quả và lớp học phù hợp miễn phí.</p>
       <form id="regform" novalidate>
         <div class="form-grid">
           <div class="field" id="fw-name">
@@ -236,7 +236,7 @@ audio{width:100%;margin-bottom:20px}
     <div class="wrap">
       <span class="txt" id="ptxt">0/15 câu</span>
       <div class="pbar"><i id="pfill"></i></div>
-      <span class="timer" id="timer">20:00</span>
+      <span class="timer" id="timer">15:00</span>
     </div>
   </div>
   <div class="stage">
@@ -666,7 +666,7 @@ function updateProgress(){
     done<TOTAL_Q ? ('Còn '+(TOTAL_Q-done)+' câu chưa trả lời') : 'Sẵn sàng — bấm nút để nhận kết quả';
 }
 /* ===== Đồng hồ 15 phút — hết giờ tự nộp ===== */
-var TEST_SECONDS = 20*60, quizTimer=null;
+var TEST_SECONDS = 15*60, quizTimer=null;
 function startTimer(){
   var left=TEST_SECONDS, el=document.getElementById('timer');
   quizTimer=setInterval(function(){
