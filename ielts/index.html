@@ -452,7 +452,14 @@ function openOtp(){
   inputs.forEach(function(i){i.value=''});
   inputs[0].focus();
   dl('ielts_otp_popup_view');            /* GTM: "Popup OTP hiển thị" */
-  requestOtp();
+  /* Khóa nút Xác minh tới khi server tạo xong mã (Apps Script mất 1–3s) —
+     tránh bấm xác minh trước khi mã tồn tại */
+  var vb=document.getElementById('otp-verify'), vl=vb.querySelector('.lbl');
+  vb.setAttribute('disabled',''); vl.textContent='Đang gửi mã…';
+  requestOtp().then(function(res){
+    vl.textContent='Xác minh';
+    if(res && res.ok) vb.removeAttribute('disabled');   /* gửi lỗi → giữ khóa, thông báo lỗi gửi đã hiện */
+  });
 }
 document.getElementById('otp-close').addEventListener('click', function(){
   document.getElementById('otp-modal').classList.add('hidden');
